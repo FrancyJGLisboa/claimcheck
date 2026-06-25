@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "claimcheck"
+version = "0.1.0"
+description = "Deterministic, no-LLM claim-vs-evidence veto: prose may assert no number, quote, or date its source data doesn't contain."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Francy Lisboa Charuto", email = "agrolisboa@gmail.com" }]
+keywords = ["llm", "guardrails", "hallucination", "grounding", "verification", "ci", "rag"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+claimcheck = "claimcheck.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/claimcheck"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
