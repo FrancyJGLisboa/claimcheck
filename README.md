@@ -41,7 +41,7 @@ legitimate summary.
 ## Install
 
 ```bash
-pip install claimcheck      # once published; for now: pip install git+https://github.com/<you>/claimcheck
+pip install claimcheck      # once published; for now: pip install git+https://github.com/FrancyJGLisboa/claimcheck
 ```
 
 ## CLI / CI gate
@@ -57,7 +57,7 @@ claimcheck --prose summary.md --data evidence.json --window 2026-06-01,2026-06-2
 Block a PR when an AI-written summary invents a number:
 
 ```yaml
-- uses: <you>/claimcheck@v0
+- uses: FrancyJGLisboa/claimcheck@v0
   with:
     prose: report.md
     data: report-data.json
