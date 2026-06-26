@@ -7,6 +7,10 @@ if it asserts a **number, quote, or date the data doesn't contain.**
 No model. No network. No API key. ~200 lines of stdlib Python. You can read
 exactly *why* it vetoed.
 
+> **Necessary, not sufficient.** claimcheck checks *figures, not reasoning* — it
+> proves no number, quote, or date was invented, **not** that the argument is sound.
+> Pair it with a judgment reviewer (a human, or an adversarial LLM critic) for that.
+
 ```python
 from claimcheck import check
 
