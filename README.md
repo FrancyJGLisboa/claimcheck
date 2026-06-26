@@ -83,6 +83,30 @@ reasons = receipt.validate_submission(submission, required_targets=("accuracy", 
                                       rubric_version="2026-06")
 ```
 
+## Verify (the credential — no server, no trust in the issuer)
+
+A receipt is only a credential if a stranger can confirm it **themselves**.
+`reverify` re-derives one from the inputs alone: it re-hashes both files (tamper-
+evidence) *and re-runs the veto* on those exact bytes. A forged `passed` receipt
+over prose that asserts a quote or date the data lacks is rejected here — a clean
+*judgment* can never launder prose that fails the *deterministic* floor.
+
+```bash
+# anyone holding the prose + data reproduces the verdict; exit 1 if they can't
+claimcheck --verify-receipt receipt.json --prose report.md --data evidence.json
+```
+
+```python
+from claimcheck import receipt
+reasons = receipt.reverify(receipt.load_receipt("receipt.json"), "evidence.json", "report.md")
+# []  → independently re-derived. non-empty → forged, stale, or tampered.
+```
+
+The deterministic verdict is **trustless** (anyone recomputes it). The judgment half
+(an LLM critic) can't be reproduced by definition, so it's *consistency-checked*, not
+re-derived — tamper-evident, not trustless. No signature needed: re-derivation is the
+proof. (A signature would only add provenance for a verifier who lacks the source data.)
+
 ## Provenance
 
 Extracted from the grounding + judgment gates of

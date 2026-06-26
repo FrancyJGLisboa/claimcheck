@@ -24,7 +24,22 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--window", default="", help="optional FROM,TO ISO date window")
     p.add_argument("--strict", action="store_true", help="fail on advisory warnings too")
     p.add_argument("--quotes", action="store_true", help="data carries quote evidence")
+    p.add_argument("--verify-receipt", default=None, metavar="PATH",
+                   help="independently re-derive a receipt against --prose/--data "
+                        "(no server, no trust in the issuer); exit 1 if it can't be reproduced")
     a = p.parse_args(argv)
+
+    if a.verify_receipt:
+        from .receipt import load_receipt, reverify
+        reasons = reverify(load_receipt(a.verify_receipt), a.data, a.prose)
+        for x in reasons:
+            print(f"[verify] {x}", file=sys.stderr)
+        if reasons:
+            print("claimcheck verify: FAILED — receipt could not be independently re-derived",
+                  file=sys.stderr)
+            return 1
+        print("claimcheck verify: OK — receipt re-derived from --prose/--data, no trust required")
+        return 0
 
     with open(a.prose, encoding="utf-8") as fh:
         prose = fh.read()
