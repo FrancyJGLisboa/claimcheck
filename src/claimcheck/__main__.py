@@ -24,6 +24,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--window", default="", help="optional FROM,TO ISO date window")
     p.add_argument("--strict", action="store_true", help="fail on advisory warnings too")
     p.add_argument("--quotes", action="store_true", help="data carries quote evidence")
+    p.add_argument("--decimal-comma", action="store_true",
+                   help="prose uses PT/EU number format (',' = decimal, '.' = thousands)")
     p.add_argument("--verify-receipt", default=None, metavar="PATH",
                    help="independently re-derive a receipt against --prose/--data "
                         "(no server, no trust in the issuer); exit 1 if it can't be reproduced")
@@ -53,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
             p.error("--window must be FROM,TO (two ISO dates)")
         window = (parts[0].strip(), parts[1].strip())
 
-    findings = check(prose, data, window=window, has_quotes=a.quotes)
+    findings = check(prose, data, window=window, has_quotes=a.quotes, decimal_comma=a.decimal_comma)
     for f in findings:
         print(f"[{f['level']}] {f['rule']}: {f['term']}", file=sys.stderr)
 

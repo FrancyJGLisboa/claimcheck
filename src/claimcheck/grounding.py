@@ -28,7 +28,7 @@ from typing import Any
 # A quoted span of real length is fabricated speech when no quote evidence exists.
 _QUOTE_RE = re.compile(r'["“”]([^"“”]{20,})["“”]')
 
-_PCT_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:%|percent)")
+_PCT_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:%|percent)")
 _MAG_RE = re.compile(r"(?<![\w./,])(\d{2}[\d.,]*)(?![\w%])")  # bare numbers ≥ 2 digits
 _UNIT_SUFFIX_RE = re.compile(
     r"\s?(?:kg|km|ha|mm|cm|ml|bbl|bpd|days?|weeks?|months?|years?|hours?)\b", re.IGNORECASE
@@ -53,10 +53,15 @@ _MONTHS = {
 }
 
 
-def _num(s: str) -> float | None:
-    """Parse an EN-formatted number (',' = thousands, '.' = decimal)."""
+def _num(s: str, decimal_comma: bool = False) -> float | None:
+    """Parse a number. EN (default): ',' = thousands, '.' = decimal.
+    PT/EU (``decimal_comma``): '.' = thousands, ',' = decimal — so '63,27' is 63.27
+    and '1.700' is 1700, the opposite of the EN convention."""
     try:
-        return float(s.rstrip(".,").replace(",", ""))
+        s = s.rstrip(".,")
+        if decimal_comma:
+            return float(s.replace(".", "").replace(",", "."))
+        return float(s.replace(",", ""))
     except ValueError:
         return None
 
@@ -107,17 +112,18 @@ def _data_pcts(data: Any) -> set[float]:
     return out | {abs(n) for n in out}
 
 
-def _stated_figures(text: str) -> tuple[list[float], list[float]]:
+def _stated_figures(text: str, decimal_comma: bool = False) -> tuple[list[float], list[float]]:
     """Prose figures split into (percentages, magnitudes). Dates are masked out
-    first; unit-suffixed counts, '#'-prefixed designations and years are skipped."""
+    first; unit-suffixed counts, '#'-prefixed designations and years are skipped.
+    ``decimal_comma`` selects PT/EU number parsing (see ``_num``)."""
     masked = _DATE_MASK_RE.sub(" ", text)
     pcts: list[float] = []
     pct_spans: list[tuple[int, int]] = []
     for m in _PCT_RE.finditer(masked):
-        try:
-            pcts.append(float(m.group(1)))
-        except ValueError:
+        v = _num(m.group(1), decimal_comma)
+        if v is None:
             continue
+        pcts.append(v)
         pct_spans.append((m.start(1), m.end(1)))
     mags: list[float] = []
     for m in _MAG_RE.finditer(masked):
@@ -128,7 +134,7 @@ def _stated_figures(text: str) -> tuple[list[float], list[float]]:
             continue  # a designation ('#11'), not a figure
         if _UNIT_SUFFIX_RE.match(masked, m.end(1)):
             continue  # a unit qualifier ('30 days'), not a data claim
-        val = _num(m.group(1))
+        val = _num(m.group(1), decimal_comma)
         if val is None or abs(val) < 10:
             continue
         if val == int(val) and 1900 <= val <= 2100:
@@ -138,12 +144,15 @@ def _stated_figures(text: str) -> tuple[list[float], list[float]]:
 
 
 def check(prose: str, data: dict[str, Any], window: tuple[str, str] | None = None,
-          has_quotes: bool = False) -> list[dict[str, str]]:
+          has_quotes: bool = False, decimal_comma: bool = False) -> list[dict[str, str]]:
     """Veto ``prose`` against ``data``; return findings (may be empty).
 
     ``window`` is an optional (from_iso, to_iso) pair enabling the stale-date
     check. ``has_quotes`` — set True when the data legitimately carries quote
-    evidence, which disables the fabricated-quote check.
+    evidence, which disables the fabricated-quote check. ``decimal_comma`` — set
+    True for PT/EU-formatted prose (',' = decimal, '.' = thousands), so '63,27' is
+    read as 63.27 instead of 6327. Locale, not domain: it makes the veto work on
+    non-US number formats without adding any domain knowledge.
     """
     text = prose or ""
     findings: list[dict[str, str]] = []
@@ -155,7 +164,7 @@ def check(prose: str, data: dict[str, Any], window: tuple[str, str] | None = Non
     mag_pool = _data_numbers(data)
     pct_pool = _data_pcts(data)
     if mag_pool or pct_pool:
-        pcts, mags = _stated_figures(text)
+        pcts, mags = _stated_figures(text, decimal_comma)
         for fig in pcts:
             tol = max(1.0, 0.15 * abs(fig))
             grounded = any(abs(g - fig) <= tol for g in pct_pool)

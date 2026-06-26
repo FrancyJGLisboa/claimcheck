@@ -98,7 +98,8 @@ def validate_submission(submission: Any, required_targets: tuple[str, ...],
 
 
 def build_receipt(evidence_path: str, prose_path: str, submission: Any,
-                  window: tuple[str, str] | None = None, has_quotes: bool = False) -> dict:
+                  window: tuple[str, str] | None = None, has_quotes: bool = False,
+                  decimal_comma: bool = False) -> dict:
     """Compute the receipt from the two files + the critic's submission.
 
     Accepts the full submission object (``{rubric_version, review, findings}``) or,
@@ -121,7 +122,8 @@ def build_receipt(evidence_path: str, prose_path: str, submission: Any,
         "claimcheck_version": _v,
         "evidence_sha": sha256_file(evidence_path),
         "prose_sha": sha256_file(prose_path),
-        "config": {"window": list(window) if window else None, "has_quotes": bool(has_quotes)},
+        "config": {"window": list(window) if window else None, "has_quotes": bool(has_quotes),
+                   "decimal_comma": bool(decimal_comma)},
         "passed": n_high == 0,
         "n_high": n_high,
         "rubric_version": submission.get("rubric_version"),
@@ -187,7 +189,8 @@ def reverify(receipt: Any, evidence_path: str, prose_path: str) -> list[str]:
         prose = fh.read()
     with open(evidence_path, encoding="utf-8") as fh:
         data = json.load(fh)
-    rederived = check(prose, data, window=window, has_quotes=bool(cfg.get("has_quotes")))
+    rederived = check(prose, data, window=window, has_quotes=bool(cfg.get("has_quotes")),
+                      decimal_comma=bool(cfg.get("decimal_comma")))
     if has_errors(rederived):
         bad = ", ".join(f"{f['rule']}:{f['term']}" for f in rederived if f["level"] == "error")
         reasons.append(f"deterministic re-derivation FAILED — the veto blocks these bytes ({bad}); "

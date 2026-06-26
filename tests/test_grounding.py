@@ -42,3 +42,22 @@ def test_in_window_date_ok():
 def test_future_date_not_flagged():
     win = ("2026-06-01", "2026-06-25")
     assert check("A catalyst lands July 4.", {}, window=win) == []
+
+
+# --- locale: PT/EU number format (',' = decimal, '.' = thousands) ---------------
+
+def test_pt_decimal_comma_reads_figures_correctly():
+    from claimcheck import check
+    data = {"price": 63.27, "move_pct": 6.8, "freight": 29.4}
+    prose = "O preço foi R$63,27, com alta de 6,8% e frete de R$29,40."
+    # WRONG locale (default EN) misreads 63,27 as 6327 → spurious unsupported-figure
+    assert any(f["rule"] == "unsupported-figure" for f in check(prose, data))
+    # CORRECT locale reads them as 63.27 / 6.8 / 29.4 → clean
+    assert check(prose, data, decimal_comma=True) == []
+
+
+def test_pt_thousands_dot_is_not_a_decimal():
+    from claimcheck import check
+    data = {"volume": 1700}
+    # PT '1.700' is 1700 (thousands dot), not 1.7
+    assert check("Volume de 1.700 toneladas.", data, decimal_comma=True) == []
