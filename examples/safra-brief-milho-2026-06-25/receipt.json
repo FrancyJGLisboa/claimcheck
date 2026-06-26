@@ -1,0 +1,36 @@
+{
+ "claimcheck_version": "0.1.0",
+ "evidence_sha": "1c13caa2502c3a83b0e86d6a3c77223b3fc7ed767acc0f1902a05d6b408ef5e3",
+ "prose_sha": "f970011c621888310a1c154acce1691c19fe689cfdb8cd092c8e7e42b691cf18",
+ "config": {
+  "window": [
+   "2026-05-21",
+   "2026-06-25"
+  ],
+  "has_quotes": false,
+  "decimal_comma": true
+ },
+ "passed": true,
+ "n_high": 0,
+ "rubric_version": "safra-brief/adversarial-rubric@2026-06",
+ "critic": "independent fresh-subagent, 2 rounds",
+ "review": [
+  {
+   "target": "causal-soundness",
+   "verdict": "ok"
+  },
+  {
+   "target": "number-grounding",
+   "verdict": "ok"
+  },
+  {
+   "target": "panel-vs-lede",
+   "verdict": "ok"
+  },
+  {
+   "target": "seasonality",
+   "verdict": "ok"
+  }
+ ],
+ "findings": []
+}

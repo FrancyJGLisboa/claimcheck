@@ -1,0 +1,386 @@
+{
+  "kind": "decomp",
+  "meta": {
+    "name": "Milho",
+    "kicker": "Grãos · Milho · Brasil",
+    "ref": "Chicago",
+    "cash_loc": "ESALQ/B3",
+    "unit": "saca de 60 kg",
+    "cash_src": "CEPEA/ESALQ"
+  },
+  "cash": {
+    "date": "2026-06-25",
+    "last": 63.27,
+    "prev": 64.99,
+    "prev_date": "2026-05-26",
+    "pct": -2.6465610093860468
+  },
+  "fut": {
+    "date": "2026-06-25",
+    "last": 4.1475,
+    "prev": 4.575,
+    "pct": -9.344262295081972,
+    "stale": false
+  },
+  "decomp": {
+    "dcash": -1.7199999999999918,
+    "price": -5.070280734768438,
+    "fx": 1.8165854369084917,
+    "basis": 1.7034418058989473,
+    "resid": -0.16974650803899216,
+    "align_gap_days": 0,
+    "reliable": true,
+    "window_days": 30,
+    "board_cash_ratio": 0.804,
+    "parity_ok": true
+  },
+  "coupling": {
+    "corr_levels": 0.66,
+    "corr_returns": 0.096,
+    "corr_returns_recent": 0.088,
+    "corr_returns_baseline": 0.107,
+    "decoupling_z": 0.11,
+    "decoupling_significant": false,
+    "n": 161,
+    "n_recent": 90
+  },
+  "export_pace": null,
+  "dominant": "price",
+  "basis_pct": {
+    "median": 56.46,
+    "n": 72,
+    "cheap": 10,
+    "rich": 13,
+    "mom_m1": 0.47999999999999954,
+    "mom_w1": 0.0,
+    "vs_mean5y": 2.08,
+    "by_ref": {
+      "b3": {
+        "median": 32.2,
+        "n": 36
+      },
+      "cbot": {
+        "median": 67.79,
+        "n": 36
+      }
+    }
+  },
+  "report_date": "2026-06-25",
+  "window": {
+    "days": 35,
+    "from": "2026-05-21",
+    "to": "2026-06-25"
+  },
+  "analytics": {
+    "term_structure": {
+      "near": {
+        "cm": "Julho/26",
+        "px": 4.1475
+      },
+      "next": {
+        "cm": "Setembro/26",
+        "px": 4.2425
+      },
+      "spread": 0.09499999999999975,
+      "spread_pct": 2.2905364677516515,
+      "shape": "carry",
+      "curve": [
+        {
+          "cm": "Julho/26",
+          "px": 4.1475
+        },
+        {
+          "cm": "Setembro/26",
+          "px": 4.2425
+        },
+        {
+          "cm": "Dezembro/26",
+          "px": 4.43
+        },
+        {
+          "cm": "Março/27",
+          "px": 4.575
+        }
+      ]
+    },
+    "vol": {
+      "annualized_pct": 18.555147631373874,
+      "n": 168,
+      "window": [
+        "2025-10-21",
+        "2026-06-25"
+      ]
+    },
+    "basis_signal": {
+      "state": "neutral",
+      "rule": "neutral",
+      "median": 56.46,
+      "by_ref": {
+        "b3": {
+          "pctile": 32.2,
+          "signal": "neutral",
+          "role": "domestic"
+        },
+        "cbot": {
+          "pctile": 67.79,
+          "signal": "neutral",
+          "role": "export"
+        }
+      },
+      "spread_pctile": 35.6,
+      "rv_read": null,
+      "divergence": false
+    }
+  },
+  "cost": {
+    "cost_per_sc": 48.66,
+    "region": "MT",
+    "region_label": "MT",
+    "snapshot_date": "202606",
+    "source": "IMEA",
+    "basis": "custo operacional total (COT) R$/60 kg, Ponderado Alta Tecnologia (MT)",
+    "gross_of_byproduct": false,
+    "yield_sc_ha": 110.85481341786368,
+    "cost_per_ha": 5394.08,
+    "unit": "60 kg",
+    "safra": "2025/26",
+    "cost_total_per_sc": 60.67,
+    "cost_total_per_ha": 6725.91,
+    "renda_fator_per_sc": 12.01,
+    "pub_url": "https://imea.com.br/imea-site/arquivo-externo?categoria=relatorio-de-mercado&arquivo=cup-milho&numeropublicacao=6"
+  },
+  "margin": {
+    "cash_per_sc": 63.27,
+    "breakeven_per_sc": 48.66,
+    "margin_per_sc": 14.610000000000007,
+    "roi_pct": 30.024660912453776,
+    "above_breakeven": true,
+    "margin_per_ha": 1619.7040449482356,
+    "yield_sc_ha": 110.85481341786368,
+    "cost_per_ha": 5394.08,
+    "breakeven_total_per_sc": 60.67,
+    "margin_total_per_sc": 2.6000000000000014,
+    "roi_total_pct": 4.285478819845066,
+    "above_total_breakeven": true,
+    "freight_per_sc": 29.4,
+    "farmgate_cash_per_sc": 33.870000000000005,
+    "farmgate_margin_per_sc": -14.789999999999992,
+    "farmgate_above_breakeven": false,
+    "farmgate_margin_total_per_sc": -26.799999999999997,
+    "farmgate_above_total_breakeven": false,
+    "freight_route": "MT→SP",
+    "freight_ano_mes": "202604",
+    "freight_n": 5
+  },
+  "exports": null,
+  "abiove": null,
+  "comexstat": {
+    "as_of": "2026-05",
+    "source": "https://comexstat.mdic.gov.br — Secex/MDIC",
+    "commodities": {
+      "corn": {
+        "latest_month": "2026-05",
+        "latest_month_t": 250449.5,
+        "ytd_t": 7468718.5,
+        "ytd_yoy_pct": 22.4,
+        "mom_pct": -47.1,
+        "prior_ytd_t": 6102096.6
+      }
+    }
+  },
+  "cot": {
+    "commodity": "corn",
+    "cftc_code": "002602",
+    "report_date": "2026-06-16",
+    "mm_long": 293859,
+    "mm_short": 343346,
+    "net_position": -49487,
+    "net_change": -48181,
+    "change_long": -1073,
+    "change_short": 47108,
+    "pct_oi_long": 15.0,
+    "pct_oi_short": 17.5,
+    "stance": "net short",
+    "flow_label": "building shorts (bearish flow)",
+    "source_url": "https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm"
+  },
+  "fundamentals": {
+    "balance": {
+      "commodity": "corn",
+      "safra": "2025/26",
+      "producao_kt": 140462.8,
+      "exportacao_kt": 46500.0,
+      "consumo_kt": 94881.4,
+      "estoque_inicial_kt": 12468.5605672392,
+      "estoque_final_kt": 13249.9605672392,
+      "stocks_to_use_pct": 9.371784808496168,
+      "stocks_to_use_rank": 38.46153846153847,
+      "tightness": "neutral",
+      "yoy_producao_pct": -0.4922157928443225,
+      "source": "CONAB",
+      "file": "OfertaDemanda"
+    },
+    "production": {
+      "commodity": "corn",
+      "safra": "2025/26",
+      "producao": 140463.09999999998,
+      "unit": "kt",
+      "area_kha": 22581.999999999996,
+      "yoy_producao_pct": 0.5492649027386357,
+      "source": "CONAB",
+      "file": "SerieHistoricaGraos"
+    },
+    "price": {
+      "commodity": "corn",
+      "uf": "MT",
+      "ano": "2026",
+      "mes": "5",
+      "valor_kg": 0.72,
+      "source": "CONAB",
+      "file": "PrecosMensalUF"
+    },
+    "freight": {
+      "uf_origem": "MT",
+      "ano": "2026",
+      "mes": "4",
+      "rs_per_tkm": 0.3073692307692308,
+      "n": 26,
+      "source": "CONAB",
+      "file": "Frete"
+    },
+    "levantamento": {
+      "commodity": "corn",
+      "ano_agricola": "2025/26",
+      "unit": "kt",
+      "lev": "9º LEV",
+      "prev_lev": "8º LEV",
+      "area_mil_ha": 22582.0,
+      "producao_mil_t": 140463.1,
+      "prev_producao_mil_t": 140171.6,
+      "rev_producao_mil_t": 291.5,
+      "rev_pct": 0.21,
+      "n_surveys": 9,
+      "by_safra": {
+        "1ª SAFRA": 29338.0,
+        "2ª SAFRA": 107865.4,
+        "3ª SAFRA": 3259.7
+      },
+      "series": [
+        [
+          "1º LEV",
+          138603.7
+        ],
+        [
+          "2º LEV",
+          138836.8
+        ],
+        [
+          "3º LEV",
+          138878.9
+        ],
+        [
+          "4º LEV",
+          138867.1
+        ],
+        [
+          "5º LEV",
+          138448.3
+        ],
+        [
+          "6º LEV",
+          138270.2
+        ],
+        [
+          "7º LEV",
+          139572.0
+        ],
+        [
+          "8º LEV",
+          140171.6
+        ],
+        [
+          "9º LEV",
+          140463.1
+        ]
+      ],
+      "source": "CONAB",
+      "file": "LevantamentoGraos"
+    }
+  },
+  "crop_phase": {
+    "month": 6,
+    "lavouras": [
+      {
+        "lavoura": "milho 2ª safra (safrinha)",
+        "fase": "colheita",
+        "dominante": true
+      },
+      {
+        "lavoura": "milho 1ª safra (verão)",
+        "fase": "colheita",
+        "dominante": false
+      }
+    ],
+    "resumo": "milho 2ª safra (safrinha) em colheita; milho 1ª safra (verão) em colheita",
+    "typical": true,
+    "source": "CONAB — Calendário de Plantio e Colheita (janela típica)"
+  },
+  "news": [
+    {
+      "title": "Colheita de soja na Argentina chega a 98%, e milho avança para 51,2%",
+      "url": "https://www.canalrural.com.br/agricultura/colheita-de-soja-na-argentina-chega-a-98-e-milho-avanca-para-512/",
+      "body": "Bolsa de Cereais de Buenos Aires manteve as estimativas de produção de soja em 50,1 milhões de toneladas e de milho em 64 milhões de toneladas. \n O post  Colheita de soja na Argentina chega a 98%, e milho avança para 51,2%  apareceu primeiro em  Canal Rural .",
+      "container": "Canal Rural",
+      "published_at": "2026-06-26T10:57:41Z",
+      "date": "2026-06-26",
+      "relevance": 0.5,
+      "tier": 2,
+      "metadata": {
+        "publisher_url": "https://www.canalrural.com.br/feed/"
+      },
+      "driver_hit": false
+    },
+    {
+      "title": "A queda na safra de milho e o aperto nas margens",
+      "url": "https://agfeed.com.br/videos/agfeed-cnn-money/a-queda-na-safra-de-milho-e-o-aperto-nas-margens",
+      "body": "O post  A queda na safra de milho e o aperto nas margens  apareceu primeiro em  AgFeed .",
+      "container": "AgFeed",
+      "published_at": "2026-06-25T23:19:23Z",
+      "date": "2026-06-25",
+      "relevance": 0.5,
+      "tier": 2,
+      "metadata": {
+        "publisher_url": "https://agfeed.com.br/feed/"
+      },
+      "driver_hit": false
+    },
+    {
+      "title": "Agroconsult confirma “safrinha de contrastes” e Brasil produz 10 milhões de toneladas a menos de milho",
+      "url": "https://agfeed.com.br/economia/agroconsult-confirma-safrinha-de-contrastes-e-brasil-produz-10-milhoes-de-tenoeladas-a-menos-de-milho",
+      "body": "Depois de registrar a &#8220;mãe de todas as safrinhas&#8221;, palavras cunhadas pela própria consultoria Agroconsult em relação ao cultivo do milho de inverno em 2025, um bom termo para definir o cultivo de 2026 é &#8220;safra de contrastes&#8221;. O resultado final e acumulado do plantio da safrin",
+      "container": "AgFeed",
+      "published_at": "2026-06-25T19:21:47Z",
+      "date": "2026-06-25",
+      "relevance": 0.5,
+      "tier": 2,
+      "metadata": {
+        "publisher_url": "https://agfeed.com.br/feed/"
+      },
+      "driver_hit": false
+    }
+  ],
+  "wx": {
+    "crop_label": "Milho (em grão)",
+    "horizon_days": 10,
+    "n_munis": 44,
+    "monitored_share": 0.403,
+    "frost_c": 2.0,
+    "coldest_c": 10.5,
+    "frost_share": 0.0,
+    "dry_run_days": 10,
+    "dry_run_saturated": true,
+    "dry_share": 0.923,
+    "source": "Open-Meteo (previsão), ponderada pela produção (IBGE/CONAB)"
+  },
+  "lang": "pt"
+}
