@@ -29,7 +29,7 @@ from typing import Any
 _QUOTE_RE = re.compile(r'["“”]([^"“”]{20,})["“”]')
 
 _PCT_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:%|percent)")
-_MAG_RE = re.compile(r"(?<![\w./,])(\d{2}[\d.,]*)(?![\w%])")  # bare numbers ≥ 2 digits
+_MAG_RE = re.compile(r"(?<![\w./,])(\d{2}[\d.,]*|\d[.,]\d+)(?![\w%])")  # ≥2 digits, or any decimal
 _UNIT_SUFFIX_RE = re.compile(
     r"\s?(?:kg|km|ha|mm|cm|ml|bbl|bpd|days?|weeks?|months?|years?|hours?)\b", re.IGNORECASE
 )
@@ -135,8 +135,9 @@ def _stated_figures(text: str, decimal_comma: bool = False) -> tuple[list[float]
         if _UNIT_SUFFIX_RE.match(masked, m.end(1)):
             continue  # a unit qualifier ('30 days'), not a data claim
         val = _num(m.group(1), decimal_comma)
-        if val is None or abs(val) < 10:
-            continue
+        if val is None or (abs(val) < 10 and val == int(val)):
+            continue  # small INTEGERS are counts ('3 sources'); a decimal
+            # point is a data claim at any size ('$4.85/bu', ONI '-1.3')
         if val == int(val) and 1900 <= val <= 2100:
             continue  # a year, never a magnitude claim
         mags.append(val)

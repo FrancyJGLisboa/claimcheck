@@ -61,3 +61,22 @@ def test_pt_thousands_dot_is_not_a_decimal():
     data = {"volume": 1700}
     # PT '1.700' is 1700 (thousands dot), not 1.7
     assert check("Volume de 1.700 toneladas.", data, decimal_comma=True) == []
+
+
+# --- small decimals: a decimal point makes a figure, whatever its size ----------
+
+def test_small_decimal_is_flagged_when_unsupported():
+    # Audit replay (bellwether 2026-07-20): a fabricated "$4.85 per bushel" farm
+    # price and an ONI of "-1.3" both sailed through GROUNDED because the <10
+    # noise floor swallowed every decimal. A decimal is a data claim, not a count.
+    finds = check("Farm price pegged at $4.85 per bushel.", {"stocks": 2756})
+    assert {"level": "warn", "rule": "unsupported-figure", "term": "4.85"} in finds
+
+
+def test_small_decimal_grounds_against_data():
+    assert check("ONI came in at -1.3 for the season.", {"oni": -1.3}) == []
+
+
+def test_small_integer_counts_stay_skipped():
+    # "3 sources", "5 states" are counts — the noise floor still holds for integers
+    assert check("Reviewed 3 sources across 5 states.", {"stocks": 2756}) == []
