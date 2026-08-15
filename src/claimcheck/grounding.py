@@ -29,7 +29,14 @@ from typing import Any
 _QUOTE_RE = re.compile(r'["“”]([^"“”]{20,})["“”]')
 
 _PCT_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:%|percent)")
-_MAG_RE = re.compile(r"(?<![\w./,])(\d{2}[\d.,]*|\d[.,]\d+)(?![\w%])")  # ≥2 digits, or any decimal
+# ≥2 digits, or any separated number. The second branch must span MULTIPLE
+# separator groups: `\d[.,]\d+` stopped at the first one, so a single leading
+# digit truncated `1,684,065` to `1,684` and the veto then reported a correct,
+# correctly cited figure as unsupported. Broken range was 1,000,000-9,999,999
+# (two leading digits took the greedy first branch, so 10,000,000 was fine) plus
+# any single-leading-digit decimal — `1,234.5` and, in decimal_comma mode,
+# `1.234,56`. Found 2026-08-15 against a live CFTC open-interest figure.
+_MAG_RE = re.compile(r"(?<![\w./,])(\d{2}[\d.,]*|\d[.,][\d.,]*\d)(?![\w%])")
 _UNIT_SUFFIX_RE = re.compile(
     r"\s?(?:kg|km|ha|mm|cm|ml|bbl|bpd|days?|weeks?|months?|years?|hours?)\b", re.IGNORECASE
 )
@@ -86,7 +93,8 @@ def _data_numbers(data: Any) -> set[float]:
     walk(data)
     nums |= {abs(n) for n in nums}
     big = {n for n in nums if abs(n) >= 10}
-    return nums | {n / 1000.0 for n in big} | {n * 1000.0 for n in big}
+    huge = {n for n in nums if abs(n) >= 1e4}  # tonnes-scale data vs "N million" prose
+    return nums | {n / 1000.0 for n in big} | {n * 1000.0 for n in big} | {n / 1e6 for n in huge}
 
 
 def _data_pcts(data: Any) -> set[float]:
@@ -145,7 +153,8 @@ def _stated_figures(text: str, decimal_comma: bool = False) -> tuple[list[float]
 
 
 def check(prose: str, data: dict[str, Any], window: tuple[str, str] | None = None,
-          has_quotes: bool = False, decimal_comma: bool = False) -> list[dict[str, str]]:
+          has_quotes: bool = False, decimal_comma: bool = False,
+          tolerance: float = 0.15) -> list[dict[str, str]]:
     """Veto ``prose`` against ``data``; return findings (may be empty).
 
     ``window`` is an optional (from_iso, to_iso) pair enabling the stale-date
@@ -153,7 +162,11 @@ def check(prose: str, data: dict[str, Any], window: tuple[str, str] | None = Non
     evidence, which disables the fabricated-quote check. ``decimal_comma`` — set
     True for PT/EU-formatted prose (',' = decimal, '.' = thousands), so '63,27' is
     read as 63.27 instead of 6327. Locale, not domain: it makes the veto work on
-    non-US number formats without adding any domain knowledge.
+    non-US number formats without adding any domain knowledge. ``tolerance`` is the
+    relative figure-match tolerance: 0.15 is the generous CI-gate default (never
+    kill a legitimate summary); an *audit* — whose loss function is the opposite,
+    a misstatement must be caught — wants ~0.02. The 1.0 absolute rounding floor
+    scales with it, so tightening the knob tightens both.
     """
     text = prose or ""
     findings: list[dict[str, str]] = []
@@ -165,16 +178,17 @@ def check(prose: str, data: dict[str, Any], window: tuple[str, str] | None = Non
     mag_pool = _data_numbers(data)
     pct_pool = _data_pcts(data)
     if mag_pool or pct_pool:
+        floor = tolerance / 0.15  # 1.0 at the CI default; audit mode tightens it in step
         pcts, mags = _stated_figures(text, decimal_comma)
         for fig in pcts:
-            tol = max(1.0, 0.15 * abs(fig))
+            tol = max(floor, tolerance * abs(fig))
             grounded = any(abs(g - fig) <= tol for g in pct_pool)
             if not grounded and abs(fig) < 10:  # small % may match a raw number
                 grounded = any(abs(g - fig) <= tol for g in mag_pool)
             if not grounded:
                 add("warn", "unsupported-figure", f"{fig:g}%")
         for fig in mags:
-            if not any(abs(g - fig) <= max(1.0, 0.15 * abs(fig)) for g in mag_pool):
+            if not any(abs(g - fig) <= max(floor, tolerance * abs(fig)) for g in mag_pool):
                 add("warn", "unsupported-figure", f"{fig:g}")
 
     # 2. Fabricated quote — a long quoted span with no quote evidence.

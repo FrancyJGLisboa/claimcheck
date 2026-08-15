@@ -56,6 +56,22 @@ claimcheck --prose summary.md --data evidence.json --strict # exit 1 on warnings
 claimcheck --prose summary.md --data evidence.json --window 2026-06-01,2026-06-25
 ```
 
+## Audit mode
+
+The 15% default tolerance is a **CI gate's** loss function: never kill a legitimate
+summary. An **audit** has the opposite one: a misstated figure must be caught.
+`--tolerance 0.02` flips the bias (the absolute rounding floor tightens in step),
+and the tolerance is recorded in the receipt, so a third party can see *which*
+loss function a passing verdict was derived under:
+
+```bash
+claimcheck --prose report.md --data evidence.json --tolerance 0.02 --strict
+```
+
+`examples/audit-specimen-milho-2026Q2/` is a complete specimen: an inspection-style
+report over a real brief, its re-derivable audit receipt, and a seeded-error holdout
+that audit mode catches and the CI default forgives.
+
 ## GitHub Action
 
 Block a PR when an AI-written summary invents a number:

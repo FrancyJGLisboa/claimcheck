@@ -26,6 +26,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--quotes", action="store_true", help="data carries quote evidence")
     p.add_argument("--decimal-comma", action="store_true",
                    help="prose uses PT/EU number format (',' = decimal, '.' = thousands)")
+    p.add_argument("--tolerance", type=float, default=0.15,
+                   help="relative figure-match tolerance (default 0.15, the forgiving "
+                        "CI gate; use ~0.02 for audit mode, where a misstatement must be caught)")
     p.add_argument("--verify-receipt", default=None, metavar="PATH",
                    help="independently re-derive a receipt against --prose/--data "
                         "(no server, no trust in the issuer); exit 1 if it can't be reproduced")
@@ -55,7 +58,8 @@ def main(argv: list[str] | None = None) -> int:
             p.error("--window must be FROM,TO (two ISO dates)")
         window = (parts[0].strip(), parts[1].strip())
 
-    findings = check(prose, data, window=window, has_quotes=a.quotes, decimal_comma=a.decimal_comma)
+    findings = check(prose, data, window=window, has_quotes=a.quotes,
+                     decimal_comma=a.decimal_comma, tolerance=a.tolerance)
     for f in findings:
         print(f"[{f['level']}] {f['rule']}: {f['term']}", file=sys.stderr)
 

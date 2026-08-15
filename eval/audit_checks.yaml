@@ -1,0 +1,21 @@
+# Loss function for the claimcheck audit product (factual-fidelity inspection).
+# Decided 2026-07-22. Francy's veto surface is this file, not the reports.
+
+checks:
+  - check: "Test set has >= 20 cases and every case's expected value traces to a named source document (scaffold key path + source field, e.g. fundamentals.levantamento <- CONAB LevantamentoGraos)."
+    false_pass: "Pad the set with 20 trivial cases derived from the audited prose itself (circular: prose grounds prose)."
+    mitigation: "Each case must name a scaffold key whose 'source'/'file' field points outside the prose; a case citing no external source field is invalid and doesn't count toward 20."
+
+  - check: "Every discrepancy in the register is reproduced by re-running `claimcheck --tolerance 0.02 --strict` on the receipt-bound bytes; the audit receipt reverifies with exit 0."
+    false_pass: "Hand-write findings into the report that the tool never produced (or drop findings it did produce)."
+    mitigation: "The register is generated from the tool's stderr, and the receipt hashes prose+data+config — any edit to inputs or findings makes reverify fail for a third party."
+
+  - check: "Audit runs at tolerance <= 0.02 (recorded in the receipt config), never the 0.15 CI default."
+    false_pass: "Run at 0.15 so nothing fires, report 'zero discrepancies', and claim audit-grade rigor."
+    mitigation: "Tolerance is recorded inside the tamper-evident receipt; a receipt whose config says 0.15 is visibly a CI run, not an audit, to anyone who reverifies."
+
+  - check: "Report is <= 4 pages with the six inspection-certificate sections (scope, sampling, findings table, discrepancy register, opinion, limitations) all present."
+    false_pass: "Ship a 4-page report whose limitations section is boilerplate that hides what was not checked."
+    mitigation: "Limitations must state the quantified detection floor (figures within ~2% of ANY evidence-pool value are undetectable) — a number re-derivable from the tool, not prose that can be vibed."
+
+holdout: "examples/audit-specimen-milho-2026Q2/holdout-seeded-brief.md — a doctored brief with two seeded misstatements (production 140.5 -> 133.1 Mt, exports 7.47 -> 7.12 Mt). The audit pipeline must flag BOTH at tolerance 0.02 while the 0.15 CI gate forgives both. This file is never used to tune tolerances, twins, or regexes; it only scores the finished pipeline. If a future change makes it pass silently, the audit product is broken regardless of what the other checks say."

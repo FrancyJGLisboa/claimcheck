@@ -1,4 +1,5 @@
 from claimcheck import check, has_errors
+from claimcheck.grounding import _stated_figures
 
 
 def test_unsupported_figure_flags_invented_number():
@@ -80,3 +81,71 @@ def test_small_decimal_grounds_against_data():
 def test_small_integer_counts_stay_skipped():
     # "3 sources", "5 states" are counts — the noise floor still holds for integers
     assert check("Reviewed 3 sources across 5 states.", {"stocks": 2756}) == []
+
+
+# --- audit mode: tighter tolerance for inspection work, not CI gating -----------
+
+def test_audit_tolerance_catches_misstatement_ci_mode_forgives():
+    # A 2.5% misstatement of a crop figure: fine for a CI gate, a finding for an audit.
+    data = {"production_kt": 140463}
+    prose = "Production came in at 137,000 kt."
+    assert check(prose, data) == []
+    finds = check(prose, data, tolerance=0.02)
+    assert any(f["rule"] == "unsupported-figure" and f["term"] == "137000" for f in finds), finds
+
+
+def test_millions_twin_grounds_tonnes_scale_data():
+    # Prose says "7.47 million tonnes"; data records 7468718.5 tonnes. One ×1000
+    # hop isn't enough — the ÷1e6 twin must ground it, even at audit tolerance.
+    data = {"ytd_t": 7468718.5}
+    assert check("Exports totaling 7.47 million tonnes.", data, tolerance=0.02) == []
+
+
+def test_audit_floor_scales_with_tolerance():
+    # Rounding 0.21 → "0.2%" must still pass an audit; a wrong "0.9%" must not.
+    data = {"rev_pct": 0.21}
+    assert check("A revision of 0.2%.", data, tolerance=0.02) == []
+    assert check("A revision of 0.9%.", data) == []  # CI floor of 1.0 forgives it
+    assert any(f["term"] == "0.9%" for f in check("A revision of 0.9%.", data, tolerance=0.02))
+
+
+# --- thousands separators: the second group must not truncate the figure --------
+
+def test_millions_with_separators_are_read_whole():
+    """The regression: `\\d[.,]\\d+` stopped at the FIRST separator group, so a
+    single leading digit truncated 1,684,065 to 1,684. Two leading digits took
+    the greedy branch, so 10,000,000 always worked — which is why fixtures under
+    a million never caught it. Found against a live CFTC open-interest value.
+
+    NOTE this assertion passes even against the OLD regex, and that is exactly
+    why the bug survived here: truncating at the second separator yields
+    value/1000, which is precisely the x1000 twin `_data_numbers` already
+    admits. claimcheck's own tolerance masks its own extractor. The bug only
+    became visible in a consumer whose figure match is EXACT (bellwether's
+    `_close`, rel=0), where 1684 does not equal 1684.065. The tests that can
+    actually fail assert `_stated_figures` directly, below."""
+    data = {"open_interest": 1684065}
+    assert check("Open interest was 1,684,065 contracts.", data) == []
+    assert check("Open interest was 1684065 contracts.", data) == []
+
+
+def test_the_whole_broken_range_round_trips():
+    for literal, value in (("999,999", 999999), ("1,000,000", 1000000),
+                           ("1,684,065", 1684065), ("9,999,999", 9999999),
+                           ("10,000,000", 10000000), ("12,345,678", 12345678)):
+        assert _stated_figures(literal)[1] == [float(value)], literal
+
+
+def test_single_leading_digit_decimal_keeps_its_fraction():
+    # `1,234.5` truncated to 1,234 — the fractional part was silently dropped.
+    assert _stated_figures("1,234.5")[1] == [1234.5]
+
+
+def test_eu_format_millions_are_read_whole():
+    # decimal_comma mode had the same truncation: 1.234,56 -> 1.234 -> 1234.
+    assert _stated_figures("1.234,56", decimal_comma=True)[1] == [1234.56]
+
+
+def test_a_bare_single_digit_is_still_not_a_figure():
+    # The widened branch must not start treating "3 sources" as a data claim.
+    assert _stated_figures("Reviewed 3 sources.")[1] == []
